@@ -1,0 +1,87 @@
+//# SHPATH-SPOJ
+// USE priority queue,unordered_map to avoid TLE
+#include<bits/stdc++.h>
+using namespace std;
+
+class graph
+{   unordered_map<int,list<pair<int,int>>> adja;
+    typedef pair<int,int> p;
+  class mycompare
+   {  public:
+       bool operator()(p &p1,p &p2)
+       {
+           return (p1.first > p2.first);
+       }
+   };
+public:
+    void buildgraph(int src,int dest,int cost)
+    {
+        adja[src].push_back(make_pair(dest,cost));
+    }
+    int shortest_path(int src,int des)
+    {
+        unordered_map<int,int> dist;
+       // unordered_map<int,bool> visited;
+
+        priority_queue<p,vector<p>,mycompare> pq;
+        for(auto node:adja)
+        {
+            dist[node.first]=INT_MAX;
+            //visited[node]=false;
+        }
+        dist[src]=0;
+        //visited[src]=true;
+      pq.push({0,src});
+        while(!pq.empty())
+        {
+            auto node=pq.top();
+            pq.pop();
+            int d=node.first;
+            int city=node.second;
+            if(city==des)
+              return dist[des];
+            if(dist[city]<d)
+                continue;
+            for(auto neigh : adja[city])
+            {
+                if(neigh.second+d<dist[neigh.first])
+                {
+                    dist[neigh.first]=d+neigh.second;
+                    pq.push({dist[neigh.first],neigh.first});
+                }
+            }
+
+        }
+        return dist[des];
+    }
+};
+int main()
+{ ios_base::sync_with_stdio(false);
+cin.tie(NULL);
+cout.tie(NULL);
+    long long T,N,j,num,neigh,cost,path;
+    string ch;
+    string ch1,ch2;
+    cin>>T;
+    while(T--)
+    {   unordered_map<string,int> mmap;
+        mmap.clear();
+        graph g;
+        j=0;
+        cin>>N;
+        while(N--){
+        cin>>ch;
+        mmap[ch]=++j;
+        cin>>num;
+        while(num--){
+        cin>>neigh>>cost;
+        g.buildgraph(j,neigh,cost);
+        }
+       }
+       cin>>path;
+       while(path--){
+       cin>>ch1>>ch2;
+       cout<<g.shortest_path(mmap[ch1],mmap[ch2])<<"\n";
+       }
+}
+}
